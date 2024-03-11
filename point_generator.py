@@ -1,13 +1,12 @@
 import cv2
 import numpy as np
 from numpy import asarray
-import math,random,os
+import math ,random , os
 
-#some parameters
+
 canvas = np.zeros((600,600,3), dtype ="uint8")
 canvas.fill(255)
 radius = 1
-radius2 = 1
 line_thikness=1
 line_darkness=255
 color = (22, 22, 144)
@@ -15,11 +14,10 @@ desktop = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
 if os.path.isfile(desktop+'/image.jpg'):
     img = cv2.imread(desktop+'/image.jpg')
 else:
-    file = 'image.jpg'
-    open(file, 'a').close()
+    img = canvas
 img = asarray(img)
 img = cv2.resize(img,(600,600),interpolation = cv2.INTER_AREA)
-img = cv2.UMat(img)
+#canvas = img
 output_size=(600,600)
 line_dest=45
 point_count=150
@@ -27,9 +25,6 @@ point2_count=150
 point_r=1
 point_g=1
 point_b=1
-point2_r=1
-point2_g=1
-point2_b=1
 pt=[]
 speed2=3
 
@@ -42,6 +37,7 @@ def point_ran_gen():
         print(item2)
     #for x in pt:
     #    cv2.circle(canvas, tuple(x), radius, color, -1)
+
 
 
 def point_ran_mov():
@@ -65,7 +61,7 @@ def point_ran_mov():
             #print(movv,new_point, x[0], x[1], x[2],x[3],x[4])
             cv2.circle(canvas, tuple(new_point), radius, (point_b,point_g,point_r), -1)
         elif movv < point2_count+point_count:
-            cv2.circle(canvas, tuple(new_point), radius2, (point2_b,point2_g,point2_r), -1)
+            cv2.circle(canvas, tuple(new_point), 1, (0, 0, 0), -1)
 
 
 def generate_lines():
@@ -75,7 +71,7 @@ def generate_lines():
                 cv2.line(canvas, x, i, (line_darkness, line_darkness, line_darkness), line_thikness)
                 #points=x,i
                 #new_list_v.append(points)
-                #print(i)
+                #print(points)
 
 #fourcc = cv2.cv.CV_FOURCC(*'XVID')
 fourcc = cv2.VideoWriter_fourcc(*'DIVX')
@@ -84,7 +80,6 @@ out=cv2.VideoWriter(desktop+'\output.mp4',cv2.VideoWriter_fourcc('X','V','i','D'
 
 
 point_ran_gen()
-pt = cv2.UMat(np.array(pt, dtype=np.uint8))
 new_point_list=[]
 new_list_v=[]
 
@@ -97,20 +92,16 @@ def nothing(x):
 
 cv2.namedWindow('Bars')
 cv2.resizeWindow('Bars',500,700)
-cv2.createTrackbar('speed','Bars',1,40,nothing)
+cv2.createTrackbar('point_count','Bars',150,600,nothing)
+cv2.createTrackbar('point_speed','Bars',1,40,nothing)
 cv2.createTrackbar('line_dest','Bars',30,600,nothing)
+cv2.createTrackbar('point_size','Bars',3,20,nothing)
+
 cv2.createTrackbar('line_thikness','Bars',0,20,nothing)
 cv2.createTrackbar('line_darkness','Bars',0,255,nothing)
-cv2.createTrackbar('point_count','Bars',150,600,nothing)
-cv2.createTrackbar('point_size','Bars',3,20,nothing)
 cv2.createTrackbar('point_r','Bars',3,255,nothing)
 cv2.createTrackbar('point_g','Bars',3,255,nothing)
 cv2.createTrackbar('point_b','Bars',3,255,nothing)
-cv2.createTrackbar('point2_count','Bars',150,600,nothing)
-cv2.createTrackbar('point2_size','Bars',1,20,nothing)
-cv2.createTrackbar('point2_r','Bars',3,255,nothing)
-cv2.createTrackbar('point2_g','Bars',3,255,nothing)
-cv2.createTrackbar('point2_b','Bars',150,255,nothing)
 switch = '0 : OFF \n1 : ON'
 cv2.createTrackbar('switch', 'Bars',0,1,nothing)
 record = '0 : OFF \n1 : ON'
@@ -130,20 +121,15 @@ while True: #main loop
     new_point_list = [] #empyy the list
 
     #laout retrive values
-    speed2 = cv2.getTrackbarPos('speed', 'Bars')
+    point_count=cv2.getTrackbarPos('point_count','Bars')
+    speed2 = cv2.getTrackbarPos('point_speed', 'Bars')
     line_dest=cv2.getTrackbarPos('line_dest','Bars')
     line_darkness=cv2.getTrackbarPos('line_darkness','Bars')
+    radius=cv2.getTrackbarPos('point_size','Bars')
     line_thikness=cv2.getTrackbarPos('line_thikness','Bars')+1
-    point_count=cv2.getTrackbarPos('point_count','Bars')
-    radius = cv2.getTrackbarPos('point_size', 'Bars')
-    point_r = cv2.getTrackbarPos('point_r', 'Bars')
+    point_r = cv2.getTrackbarPos('point_r','Bars')
     point_g = cv2.getTrackbarPos('point_g', 'Bars')
     point_b = cv2.getTrackbarPos('point_b', 'Bars')
-    point2_count=cv2.getTrackbarPos('point2_count','Bars')
-    radius2=cv2.getTrackbarPos('point2_size','Bars')
-    point2_r = cv2.getTrackbarPos('point2_r', 'Bars')
-    point2_g = cv2.getTrackbarPos('point2_g', 'Bars')
-    point2_b = cv2.getTrackbarPos('point2_b', 'Bars')
 
     frame = cv2.resize(canvas,output_size,interpolation = cv2.INTER_AREA)
 
@@ -155,7 +141,7 @@ while True: #main loop
         out.write(frame)
 
     k = cv2.waitKey(1)
-    if k!= -1:
+    if k == 27:
         break
     cv2.imshow("Simulation", canvas)
 
